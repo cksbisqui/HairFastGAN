@@ -13,11 +13,13 @@ WEIGHTS_DIR.mkdir(exist_ok=True)
 
 # Map of required weights and their download URLs (example: Google Drive or Hugging Face)
 WEIGHTS_URLS = {
-    "StyleGAN/ffhq.pth": "https://huggingface.co/your-username/hairfastgan/resolve/main/ffhq.pth",
-    "PostProcess/rotate_best.pth": "https://huggingface.co/your-username/hairfastgan/resolve/main/rotate_best.pth",
-    "Blending/ffhq_G.pth": "https://huggingface.co/your-username/hairfastgan/resolve/main/ffhq_G.pth",
-    "PostProcess/pp_model.pth": "https://huggingface.co/your-username/hairfastgan/resolve/main/pp_model.pth"
+    "StyleGAN/ffhq.pth": "https://huggingface.co/chucks/hairfastgan-weights/resolve/main/StyleGAN/ffhq.pth",
+    "PostProcess/rotate_best.pth": "https://huggingface.co/chucks/hairfastgan-weights/resolve/main/PostProcess/rotate_best.pth",
+    "Blending/ffhq_G.pth": "https://huggingface.co/chucks/hairfastgan-weights/resolve/main/Blending/ffhq_G.pth",
+    "PostProcess/pp_model.pth": "https://huggingface.co/chucks/hairfastgan-weights/resolve/main/PostProcess/pp_model.pth",
+    "ShapeAdaptor/shape_predictor_68_face_landmarks.dat": "https://huggingface.co/chucks/hairfastgan-weights/resolve/main/ShapeAdaptor/shape_predictor_68_face_landmarks.dat"
 }
+
 
 def ensure_weights():
     for rel_path, url in WEIGHTS_URLS.items():
