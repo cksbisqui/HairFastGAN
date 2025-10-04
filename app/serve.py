@@ -1,15 +1,27 @@
-from fastapi import FastAPI, UploadFile, File
-from app.infer import load_model, run_inference
+import requests
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from .infer import load_model, run_inference
 
 app = FastAPI()
 model = load_model()
 
-@app.post("/tryon")
-async def try_on(face: UploadFile = File(...),
-                 shape: UploadFile = File(...),
-                 color: UploadFile = File(None)):
-    face_bytes = await face.read()
-    shape_bytes = await shape.read()
-    color_bytes = await (color.read() if color else b"")
-    output_png = run_inference(model, face_bytes, shape_bytes, color_bytes)
-    return {"image_base64": output_png}
+class InferenceRequest(BaseModel):
+    face_url: str
+    shape_url: str
+    color_url: str | None = None
+
+def fetch_bytes(url: str) -> bytes:
+    resp = requests.get(url)
+    resp.raise_for_status()
+    return resp.content
+
+@app.post("/run")
+def run(request: InferenceRequest):
+    face_bytes = fetch_bytes(request.face_url)
+    shape_bytes = fetch_bytes(request.shape_url)
+    color_bytes = fetch_bytes(request.color_url) if request.color_url else None
+
+    result_b64 = run_inference(model, face_bytes, shape_bytes, color_bytes)
+    return {"output": result_b64}
