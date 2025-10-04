@@ -1,23 +1,30 @@
-FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04
+# Start from a Python base image
+FROM python:3.10-slim
 
-# Install system dependencies
+# Install system dependencies required for dlib and scientific libs
 RUN apt-get update && apt-get install -y \
-    python3 python3-pip git git-lfs wget \
+    build-essential \
+    cmake \
+    libopenblas-dev \
+    liblapack-dev \
+    libx11-dev \
+    libgtk-3-dev \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /workspace/HairFastGAN
-
-# Copy repo contents
-COPY . /workspace/HairFastGAN
-
 # Install Python dependencies
+COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt && \
     pip install fastapi uvicorn
 
-# Expose FastAPI port
+# Copy your app code
+COPY . /app
+WORKDIR /app
+
+# Expose port
 EXPOSE 8000
 
-# Start FastAPI server
+# Start the server
 CMD ["uvicorn", "app.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
