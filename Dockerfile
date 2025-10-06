@@ -1,6 +1,8 @@
 # ✅ CUDA-enabled base image with dev tools
 FROM nvidia/cuda:11.8.0-devel-ubuntu20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # 🛠 Install Python and system dependencies
 RUN apt-get update && apt-get install -y \
     python3 python3-pip python3-dev \
