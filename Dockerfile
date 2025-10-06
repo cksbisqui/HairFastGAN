@@ -18,9 +18,9 @@ ENV PATH=$CUDA_HOME/bin:$PATH
 ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 
 # 🐍 Install Python dependencies
-COPY requirements.txt .
+COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt && \
+    pip install -r /tmp/requirements.txt && \
     pip install fastapi uvicorn
 
 # 📦 Copy your app code
@@ -32,4 +32,3 @@ EXPOSE 8000
 
 # 🚀 Start FastAPI server
 CMD ["uvicorn", "app.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
