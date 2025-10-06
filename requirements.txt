@@ -4,7 +4,6 @@ certifi==2024.2.2
 charset-normalizer==3.3.2
 click==8.1.7
 clip @ git+https://github.com/openai/CLIP.git@a1d071733d7111c9c014f024669f959182114e33
-contourpy==1.2.0
 cycler==0.12.1
 dill==0.3.6
 dlib==19.24.1
