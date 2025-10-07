@@ -24,9 +24,6 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=$CUDA_HOME/bin:$PATH
 ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 
-# Restrict arch list to your GPU family (86 = A10/A100; use 75 if on T4)
-ENV TORCH_CUDA_ARCH_LIST="86"
-
 # Upgrade packaging tools
 RUN pip install --upgrade pip setuptools wheel
 
@@ -38,12 +35,11 @@ RUN pip install -r /tmp/requirements.txt
 COPY . /app
 WORKDIR /app
 
-# Precompile StyleGAN2 fused ops so they don’t JIT at runtime
-RUN python3 precompile.py
+# Precompile StyleGAN2 fused ops (safe: skips if no GPU at build time)
+RUN python3 precompile.py || true
 
 # Expose FastAPI port
 EXPOSE 8000
 
 # Start server
 CMD ["uvicorn", "app.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
