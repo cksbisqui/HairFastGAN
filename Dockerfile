@@ -1,10 +1,10 @@
-# CUDA 11.8 devel (includes nvcc) on Ubuntu 22.04
+# ✅ CUDA 11.8 devel (includes nvcc) on Ubuntu 22.04
 FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
 
 # Avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# System deps: Python 3.10 + build toolchain
+# 🛠 Install Python 3.10 and build toolchain
 RUN apt-get update && apt-get install -y \
     python3.10 python3.10-dev python3.10-distutils \
     python3-pip \
@@ -24,7 +24,7 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=$CUDA_HOME/bin:$PATH
 ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 
-# Recommended: restrict arch list to your GPU family
+# Restrict arch list to your GPU family (86 = A10/A100; use 75 if on T4)
 ENV TORCH_CUDA_ARCH_LIST="86"
 
 # Upgrade packaging tools
@@ -38,7 +38,7 @@ RUN pip install -r /tmp/requirements.txt
 COPY . /app
 WORKDIR /app
 
-# Precompile StyleGAN2 fused ops
+# Precompile StyleGAN2 fused ops so they don’t JIT at runtime
 RUN python3 precompile.py
 
 # Expose FastAPI port
@@ -46,3 +46,4 @@ EXPOSE 8000
 
 # Start server
 CMD ["uvicorn", "app.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
