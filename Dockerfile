@@ -1,10 +1,10 @@
 # CUDA 11.8 devel (includes nvcc) on Ubuntu 22.04
 FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
 
-# Avoid interactive prompts (tzdata, etc.)
+# Avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# System deps: Python 3.10 + build toolchain for PyTorch extensions
+# System deps: Python 3.10 + build toolchain
 RUN apt-get update && apt-get install -y \
     python3.10 python3.10-dev python3.10-distutils \
     python3-pip \
@@ -24,14 +24,13 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=$CUDA_HOME/bin:$PATH
 ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 
-# Recommended: restrict arch list to your GPU family to speed compilation and avoid mismatch
-# RunPod often uses T4 (75), A10/A100 (86, 80). Your logs show compute_86, so we set 86 explicitly.
+# Recommended: restrict arch list to your GPU family
 ENV TORCH_CUDA_ARCH_LIST="86"
 
 # Upgrade packaging tools
 RUN pip install --upgrade pip setuptools wheel
 
-# Install Python deps first to leverage Docker layer caching
+# Install Python deps first
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
@@ -39,17 +38,8 @@ RUN pip install -r /tmp/requirements.txt
 COPY . /app
 WORKDIR /app
 
-# Precompile StyleGAN2 fused ops so they don’t JIT during server startup
-# This imports the module that triggers torch.utils.cpp_extension.load() builds.
-# If your import path differs, adjust accordingly.
-RUN python3 - << 'PY'
-import os
-# Respect the arch list from env and ensure CUDA is visible
-os.environ.setdefault("TORCH_CUDA_ARCH_LIST", "86")
-# Import the fused op to trigger build
-from models.stylegan2.op import fused_act
-print("Precompiled fused_act successfully.")
-PY
+# Precompile StyleGAN2 fused ops
+RUN python3 precompile.py
 
 # Expose FastAPI port
 EXPOSE 8000
