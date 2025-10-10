@@ -34,7 +34,7 @@ class Net(nn.Module):
             download_weight(self.opts.ckpt)
 
         print('Loading StyleGAN2 from checkpoint: {}'.format(self.opts.ckpt))
-        checkpoint = torch.load(self.opts.ckpt)
+        checkpoint = torch.load(self.opts.ckpt, weights_only=False, map_location="cpu")
         device = self.opts.device
         self.generator.load_state_dict(checkpoint['g_ema'])
         self.latent_avg = checkpoint['latent_avg']
